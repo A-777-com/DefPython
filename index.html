@@ -1,0 +1,1733 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Функции в Python  Академический курс</title>
+    <style>
+        /* =============================================
+           ГЛОБАЛЬНЫЕ СТИЛИ
+           ============================================= */
+
+        /* Сброс стандартных отступов браузера */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box; /* Размер элемента включает padding и border */
+        }
+
+        body {
+            /* Академический шрифт с засечками (как в учебниках) */
+            font-family: "Palatino Linotype", "Book Antiqua", Palatino, Georgia, serif;
+            background-color: #faf8f5; /* Тёплый пергаментный фон */
+            color: #2c2c2c;           /* Почти чёрный текст */
+            line-height: 1.75;        /* Межстрочный интервал для читаемости */
+        }
+
+        /* =============================================
+           ШАПКА СТРАНИЦЫ
+           ============================================= */
+        .header {
+            background: #1b2a4a;          /* Тёмно-синий «университетский» цвет */
+            color: #f0e6d3;               /* Тёплый светлый текст */
+            padding: 28px 0 22px;
+            border-bottom: 4px solid #c9a227; /* Золотая полоса (как в дипломах) */
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 30px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            margin-bottom: 6px;
+        }
+
+        .header .subtitle {
+            font-size: 15px;
+            color: #c9a227;     /* Золотой акцент */
+            font-style: italic;
+        }
+
+        /* =============================================
+           КОНТЕЙНЕР (ограничивает ширину контента)
+           ============================================= */
+        .container {
+            max-width: 960px;
+            margin: 0 auto;     /* Центрируем по горизонтали */
+            padding: 0 24px;
+        }
+
+        /* =============================================
+           НАВИГАЦИЯ ПО ГЛАВАМ
+           ============================================= */
+        .chapter-nav {
+            display: flex;
+            flex-wrap: wrap;          /* Переносим кнопки на новую строку при нехватке места */
+            gap: 0;
+            background: #ffffff;
+            border: 1px solid #d5c9b1;
+            border-radius: 8px;
+            margin: 28px 0 0;
+            overflow: hidden;         /* Скругление краёв работает для дочерних элементов */
+        }
+
+        .chapter-btn {
+            flex: 1;                  /* Кнопки делят пространство поровну */
+            min-width: 140px;
+            padding: 14px 10px;
+            border: none;
+            border-right: 1px solid #d5c9b1;
+            background: #ffffff;
+            color: #1b2a4a;
+            font-family: inherit;     /* Наследуем академический шрифт */
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .chapter-btn:last-child {
+            border-right: none;       /* У последней кнопки нет правой границы */
+        }
+
+        .chapter-btn:hover {
+            background: #f0e6d3;      /* Тёплый при наведении */
+        }
+
+        /* Активная глава */
+        .chapter-btn.active {
+            background: #1b2a4a;
+            color: #c9a227;
+        }
+
+        /* =============================================
+           ПРОГРЕСС-БАР (полоска прогресса обучения)
+           ============================================= */
+        .progress-wrap {
+            margin: 16px 0 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .progress-label {
+            font-size: 13px;
+            color: #7a7062;
+            white-space: nowrap;
+        }
+
+        .progress-track {
+            flex: 1;
+            height: 8px;
+            background: #e8e0d4;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #c9a227;          /* Золотой прогресс */
+            width: 0%;
+            transition: width 0.5s ease;
+            border-radius: 4px;
+        }
+
+        /* =============================================
+           СЕКЦИИ (главы) — показываем одну, прячем остальные
+           ============================================= */
+        .chapter {
+            display: none;                /* По умолчанию скрыта */
+            animation: chapterFade 0.4s ease;
+        }
+
+        .chapter.visible {
+            display: block;               /* Видимая глава */
+        }
+
+        @keyframes chapterFade {
+            from { opacity: 0; transform: translateY(12px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* =============================================
+           КАРТОЧКИ
+           ============================================= */
+        .card {
+            background: #ffffff;
+            border: 1px solid #d5c9b1;
+            border-radius: 10px;
+            padding: 24px 28px;
+            margin: 20px 0;
+            /* Лёгкая академическая тень */
+            box-shadow: 0 2px 6px rgba(43, 42, 40, 0.06);
+        }
+
+        .card h2 {
+            font-size: 21px;
+            color: #1b2a4a;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #e8e0d4;
+        }
+
+        .card h3 {
+            font-size: 17px;
+            color: #4a3f35;
+            margin: 16px 0 8px;
+        }
+
+        .card p {
+            margin: 8px 0;
+            color: #3d3d3d;
+        }
+
+        .card ul, .card ol {
+            padding-left: 24px;
+            margin: 8px 0;
+        }
+
+        .card li {
+            margin: 6px 0;
+        }
+
+        /* =============================================
+           БЛОКИ КОДА
+           ============================================= */
+        .code-block {
+            background: #1e1e2e;          /* Тёмный фон (как в редакторе) */
+            border: 1px solid #3a3a50;
+            border-radius: 10px;
+            padding: 0;
+            margin: 14px 0;
+            overflow: hidden;
+            font-family: "Fira Code", "Consolas", "Courier New", monospace;
+            font-size: 14px;
+            line-height: 1.7;
+        }
+
+        /* Заголовок блока кода (название файла / пометка) */
+        .code-header {
+            background: #2a2a40;
+            padding: 8px 16px;
+            color: #c9a227;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid #3a3a50;
+        }
+
+        /* Строка кода (кликабельная) */
+        .code-line {
+            display: grid;
+            grid-template-columns: 44px 1fr;
+            padding: 4px 16px 4px 0;
+            cursor: pointer;
+            border-left: 3px solid transparent;
+            transition: background 0.15s, border-color 0.15s;
+        }
+
+        .code-line:hover {
+            background: rgba(201, 162, 39, 0.08);
+        }
+
+        /* Активная (выбранная) строка */
+        .code-line.highlighted {
+            background: rgba(201, 162, 39, 0.15);
+            border-left-color: #c9a227;
+        }
+
+        /* Номер строки */
+        .line-num {
+            color: #5a5a72;
+            text-align: right;
+            padding-right: 14px;
+            user-select: none;         /* Нельзя выделить мышкой */
+        }
+
+        /* Текст кода */
+        .line-text {
+            color: #d4d4e0;
+            white-space: pre;          /* Сохраняем пробелы (для отступов) */
+        }
+
+        /* =============================================
+           ПОДСВЕТКА СИНТАКСИСА (цвета для слов Python)
+           ============================================= */
+        .kw   { color: #c678dd; font-weight: bold; }  /* Ключевые слова: def, return, if */
+        .fn   { color: #61afef; }                      /* Имена функций */
+        .str  { color: #98c379; }                      /* Строки в кавычках */
+        .num  { color: #d19a66; }                      /* Числа */
+        .par  { color: #e5c07b; }                      /* Параметры / переменные */
+        .comm { color: #5c6370; font-style: italic; }  /* Комментарии */
+        .op   { color: #56b6c2; }                      /* Операторы: +, -, ==, ** */
+        .bi   { color: #e06c75; }                      /* Встроенные функции: print, len */
+
+        /* =============================================
+           ПАНЕЛЬ ОБЪЯСНЕНИЯ (появляется при клике на строку)
+           ============================================= */
+        .explain-panel {
+            background: #fdf6e3;          /* Тёплый «пергаментный» */
+            border: 1px solid #d5c9b1;
+            border-left: 4px solid #c9a227;
+            border-radius: 0 10px 10px 0;
+            padding: 18px 22px;
+            margin: 14px 0;
+            min-height: 60px;
+        }
+
+        .explain-panel .explain-title {
+            font-weight: 700;
+            color: #1b2a4a;
+            margin-bottom: 6px;
+            font-size: 15px;
+        }
+
+        .explain-panel .explain-text {
+            color: #4a3f35;
+            font-size: 14.5px;
+            line-height: 1.7;
+        }
+
+        .explain-panel code {
+            background: #e8e0d4;
+            padding: 1px 6px;
+            border-radius: 4px;
+            font-family: "Fira Code", monospace;
+            font-size: 13px;
+            color: #1b2a4a;
+        }
+
+        /* =============================================
+           АККОРДЕОН (раскрывающийся блок)
+           ============================================= */
+        .accordion {
+            border: 1px solid #d5c9b1;
+            border-radius: 10px;
+            margin: 14px 0;
+            overflow: hidden;
+        }
+
+        .accordion-header {
+            background: #f7f1e7;
+            padding: 14px 20px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 600;
+            color: #1b2a4a;
+            transition: background 0.2s;
+            user-select: none;
+        }
+
+        .accordion-header:hover {
+            background: #f0e6d3;
+        }
+
+        .accordion-arrow {
+            transition: transform 0.3s;
+            font-size: 14px;
+        }
+
+        .accordion-header.open .accordion-arrow {
+            transform: rotate(180deg);
+        }
+
+        .accordion-body {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease, padding 0.3s ease;
+            padding: 0 20px;
+            background: #ffffff;
+        }
+
+        .accordion-body.open {
+            max-height: 3000px;          /* Достаточно большое значение */
+            padding: 18px 20px;
+        }
+
+        /* =============================================
+           ТАБЛИЦА (пошаговая трассировка)
+           ============================================= */
+        .trace-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 14px 0;
+            font-size: 14px;
+        }
+
+        .trace-table th {
+            background: #1b2a4a;
+            color: #f0e6d3;
+            padding: 10px 14px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .trace-table td {
+            padding: 10px 14px;
+            border-bottom: 1px solid #e8e0d4;
+            vertical-align: top;
+        }
+
+        .trace-table tr:nth-child(even) {
+            background: #faf6ef;           /* Чередование для читаемости */
+        }
+
+        .trace-table tr:hover {
+            background: #f0e6d3;
+        }
+
+        .trace-table code {
+            background: #e8e0d4;
+            padding: 1px 5px;
+            border-radius: 3px;
+            font-size: 13px;
+        }
+
+        /* =============================================
+           ВИЗУАЛИЗАТОР (пошаговое выполнение)
+           ============================================= */
+        .visualizer {
+            border: 2px solid #1b2a4a;
+            border-radius: 12px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+
+        .viz-header {
+            background: #1b2a4a;
+            color: #c9a227;
+            padding: 12px 20px;
+            font-weight: 700;
+            text-align: center;
+            font-size: 16px;
+        }
+
+        .viz-body {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0;
+        }
+
+        @media (max-width: 700px) {
+            .viz-body { grid-template-columns: 1fr; }
+        }
+
+        .viz-col {
+            padding: 18px;
+            border-right: 1px solid #e8e0d4;
+        }
+
+        .viz-col:last-child {
+            border-right: none;
+        }
+
+        .viz-col h4 {
+            color: #1b2a4a;
+            margin-bottom: 10px;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .viz-controls {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            padding: 14px;
+            background: #f7f1e7;
+            border-top: 1px solid #e8e0d4;
+            flex-wrap: wrap;
+        }
+
+        .viz-btn {
+            padding: 10px 18px;
+            border: 1px solid #1b2a4a;
+            background: #ffffff;
+            color: #1b2a4a;
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 13px;
+            font-weight: 600;
+            transition: background 0.2s;
+        }
+
+        .viz-btn:hover { background: #f0e6d3; }
+        .viz-btn:disabled { opacity: 0.4; cursor: default; }
+
+        .viz-btn.primary {
+            background: #1b2a4a;
+            color: #c9a227;
+            border-color: #1b2a4a;
+        }
+
+        .viz-btn.primary:hover { background: #243660; }
+
+        .viz-var {
+            font-family: "Fira Code", monospace;
+            font-size: 13px;
+            padding: 5px 10px;
+            margin: 4px 0;
+            background: #faf6ef;
+            border-radius: 6px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .viz-var.flash {
+            animation: varFlash 0.5s;
+        }
+
+        @keyframes varFlash {
+            0%   { background: #c9a227; color: #fff; }
+            100% { background: #faf6ef; color: #2c2c2c; }
+        }
+
+        .viz-output {
+            font-family: "Fira Code", monospace;
+            font-size: 13px;
+            background: #1e1e2e;
+            color: #98c379;
+            padding: 12px;
+            border-radius: 8px;
+            min-height: 50px;
+            white-space: pre-wrap;
+        }
+
+        .viz-message {
+            text-align: center;
+            padding: 10px;
+            color: #7a7062;
+            font-style: italic;
+            font-size: 13.5px;
+        }
+
+        /* =============================================
+           КВИЗ
+           ============================================= */
+        .quiz-block {
+            border: 1px solid #d5c9b1;
+            border-radius: 10px;
+            padding: 20px 24px;
+            margin: 16px 0;
+            background: #ffffff;
+        }
+
+        .quiz-block h3 {
+            color: #1b2a4a;
+            margin-bottom: 10px;
+        }
+
+        .quiz-options {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .quiz-opt {
+            padding: 12px 18px;
+            border: 1px solid #d5c9b1;
+            border-radius: 8px;
+            cursor: pointer;
+            background: #ffffff;
+            font-family: inherit;
+            font-size: 14.5px;
+            text-align: left;
+            transition: background 0.15s, border-color 0.15s;
+        }
+
+        .quiz-opt:hover { background: #fdf6e3; border-color: #c9a227; }
+
+        .quiz-opt.correct {
+            background: #e8f5e9;
+            border-color: #66bb6a;
+            color: #2e7d32;
+        }
+
+        .quiz-opt.wrong {
+            background: #fce4ec;
+            border-color: #ef5350;
+            color: #c62828;
+        }
+
+        .quiz-opt.locked {
+            pointer-events: none;
+            opacity: 0.7;
+        }
+
+        .quiz-feedback {
+            margin-top: 12px;
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            line-height: 1.6;
+            display: none;
+        }
+
+        .quiz-feedback.show { display: block; }
+
+        .quiz-feedback.ok {
+            background: #e8f5e9;
+            border: 1px solid #a5d6a7;
+            color: #2e7d32;
+        }
+
+        .quiz-feedback.no {
+            background: #fce4ec;
+            border: 1px solid #ef9a9a;
+            color: #c62828;
+        }
+
+        .score-panel {
+            background: #1b2a4a;
+            color: #c9a227;
+            border-radius: 10px;
+            padding: 18px 24px;
+            text-align: center;
+            margin: 20px 0;
+            font-size: 18px;
+            font-weight: 700;
+            display: none;           /* Покажем после прохождения */
+        }
+
+        .score-panel.show { display: block; }
+
+        /* =============================================
+           НИЖНЯЯ НАВИГАЦИЯ (Назад / Далее)
+           ============================================= */
+        .chapter-footer {
+            display: flex;
+            justify-content: space-between;
+            margin: 30px 0 50px;
+            padding-top: 18px;
+            border-top: 2px solid #e8e0d4;
+        }
+
+        .foot-btn {
+            padding: 12px 24px;
+            border: 1px solid #1b2a4a;
+            background: #ffffff;
+            color: #1b2a4a;
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 14px;
+            font-weight: 600;
+            transition: background 0.2s;
+        }
+
+        .foot-btn:hover { background: #f0e6d3; }
+        .foot-btn:disabled { opacity: 0.3; cursor: default; }
+
+        /* =============================================
+           ПОДСКАЗКИ / ЗАМЕТКИ
+           ============================================= */
+        .note {
+            background: #fdf6e3;
+            border: 1px solid #d5c9b1;
+            border-left: 4px solid #c9a227;
+            border-radius: 0 8px 8px 0;
+            padding: 14px 18px;
+            margin: 14px 0;
+            font-size: 14.5px;
+            color: #4a3f35;
+        }
+
+        .note.warning {
+            border-left-color: #e06c75;
+            background: #fef0f0;
+        }
+
+        .note.success {
+            border-left-color: #66bb6a;
+            background: #f0faf0;
+        }
+
+        /* Маленький текст */
+        .muted { color: #7a7062; font-size: 13px; }
+
+        /* Инлайн код */
+        .card code, p code, li code {
+            background: #e8e0d4;
+            padding: 1px 6px;
+            border-radius: 4px;
+            font-family: "Fira Code", "Consolas", monospace;
+            font-size: 13px;
+            color: #1b2a4a;
+        }
+
+        /* Двойная колонка */
+        .two-cols {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        @media (max-width: 700px) {
+            .two-cols { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+
+<body>
+
+<!-- ===================================================================
+     ШАПКА
+     =================================================================== -->
+<div class="header">
+    <div class="container">
+        <h1>📖 Функции в Python</h1>
+        <div class="subtitle">Академический курс · 7 класс · </div>
+    </div>
+</div>
+
+<!-- ===================================================================
+     ОСНОВНОЙ КОНТЕНТ
+     =================================================================== -->
+<div class="container">
+
+    <!-- Навигация по главам -->
+    <div class="chapter-nav" id="chapterNav"></div>
+
+    <!-- Прогресс -->
+    <div class="progress-wrap">
+        <span class="progress-label" id="progressLabel">Глава 1 из 7</span>
+        <div class="progress-track">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+    </div>
+
+    <!-- ============================================
+         ГЛАВА 1 — ЧТО ТАКОЕ ФУНКЦИЯ
+         ============================================ -->
+    <div class="chapter visible" id="ch-0">
+        <div class="card">
+            <h2>§1. Что такое функция и зачем она нужна</h2>
+            <p>
+                Представь, что ты каждый день утром варишь чай. Действия одни и те же:
+                налить воду → вскипятить → положить заварку → подождать.
+            </p>
+            <p>
+                <strong>Функция</strong> - это «рецепт», который ты записываешь <em>один раз</em>,
+                а потом используешь <em>сколько угодно раз</em>, просто называя его по имени.
+            </p>
+
+            <h3>Аналогия из жизни</h3>
+            <table class="trace-table">
+                <tr><th>Без функции</th><th>С функцией</th></tr>
+                <tr>
+                    <td>Каждый раз пишешь:<br>«Налей воду, вскипяти, положи заварку…»</td>
+                    <td>Один раз записываешь рецепт «Свари чай».<br>Потом просто говоришь: <code>свари_чай()</code></td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="card">
+            <h2>Словарь терминов</h2>
+            <table class="trace-table">
+                <tr><th>Термин</th><th>Что означает</th><th>Пример</th></tr>
+                <tr>
+                    <td><code>def</code></td>
+                    <td>Ключевое слово «определить функцию» (от англ. define)</td>
+                    <td><code>def greet():</code></td>
+                </tr>
+                <tr>
+                    <td>Параметр</td>
+                    <td>Имя «входа» при определении функции</td>
+                    <td><code>def greet(name):</code> — <code>name</code> параметр</td>
+                </tr>
+                <tr>
+                    <td>Аргумент</td>
+                    <td>Конкретное значение, которое передаём при вызове</td>
+                    <td><code>greet("Маша")</code> — <code>"Маша"</code> аргумент</td>
+                </tr>
+                <tr>
+                    <td><code>return</code></td>
+                    <td>Команда «верни результат наружу»</td>
+                    <td><code>return a + b</code></td>
+                </tr>
+                <tr>
+                    <td>Вызов</td>
+                    <td>Использование функции по имени</td>
+                    <td><code>greet("Маша")</code></td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="note">
+            💡 <strong>Запомни:</strong> функцию нужно сначала <em>определить</em> (написать рецепт),
+            а потом <em>вызвать</em> (использовать рецепт).
+        </div>
+    </div>
+
+    <!-- ============================================
+         ГЛАВА 2 — СИНТАКСИС def
+         ============================================ -->
+    <div class="chapter" id="ch-1">
+        <div class="card">
+            <h2>§2. Как написать функцию: синтаксис <code>def</code></h2>
+            <p>Посмотри на самый простой пример - функция, которая печатает приветствие:</p>
+
+            <!-- Блок кода с кликабельными строками -->
+            <div class="code-block">
+                <div class="code-header">📄 пример_1.py</div>
+                <div class="code-line" data-explain="def-line">
+                    <span class="line-num">1</span>
+                    <span class="line-text"><span class="kw">def</span> <span class="fn">greet</span>():</span>
+                </div>
+                <div class="code-line" data-explain="print-line">
+                    <span class="line-num">2</span>
+                    <span class="line-text">    <span class="bi">print</span>(<span class="str">"Привет, мир!"</span>)</span>
+                </div>
+                <div class="code-line" data-explain="empty-line">
+                    <span class="line-num">3</span>
+                    <span class="line-text"></span>
+                </div>
+                <div class="code-line" data-explain="call-line">
+                    <span class="line-num">4</span>
+                    <span class="line-text"><span class="fn">greet</span>()</span>
+                </div>
+            </div>
+
+            <p class="muted">👆 Кликни по любой строке кода — ниже появится подробное объяснение.</p>
+
+            <!-- Панель объяснения -->
+            <div class="explain-panel" id="explainPanel1">
+                <div class="explain-title" id="explainTitle1">Выбери строку кода выше</div>
+                <div class="explain-text" id="explainText1">
+                    Нажми на любую строку с номером, чтобы увидеть построчный разбор.
+                </div>
+            </div>
+        </div>
+
+        <!-- Схема строки def -->
+        <div class="card">
+            <h2>Разбираем строку <code>def greet():</code> по буквам</h2>
+
+            <div class="code-block">
+                <div class="code-header">Схема</div>
+                <div class="code-line">
+                    <span class="line-num"></span>
+                    <span class="line-text"><span class="kw">def</span>  <span class="fn">greet</span><span class="op">(</span><span class="op">)</span><span class="op">:</span></span>
+                </div>
+                <div class="code-line">
+                    <span class="line-num"></span>
+                    <span class="line-text"><span class="comm"> │      │    │ │</span></span>
+                </div>
+                <div class="code-line">
+                    <span class="line-num"></span>
+                    <span class="line-text"><span class="comm"> │      │    │ └── двоеточие — начинает блок тела</span></span>
+                </div>
+                <div class="code-line">
+                    <span class="line-num"></span>
+                    <span class="line-text"><span class="comm"> │      │    └──── скобки — место для параметров</span></span>
+                </div>
+                <div class="code-line">
+                    <span class="line-num"></span>
+                    <span class="line-text"><span class="comm"> │      └───────── имя функции (придумываешь сам)</span></span>
+                </div>
+                <div class="code-line">
+                    <span class="line-num"></span>
+                    <span class="line-text"><span class="comm"> └──────────────── ключевое слово «определить»</span></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="note warning">
+            ⚠️ <strong>Частая ошибка:</strong> забыть двоеточие <code>:</code> в конце строки <code>def</code>.
+            Python выдаст <code>SyntaxError</code> - синтаксическую ошибку.
+        </div>
+
+        <div class="note warning">
+            ⚠️ <strong>Отступы обязательны!</strong> Тело функции (строки внутри неё) должно начинаться
+            с отступа - 4 пробела. Без отступа Python не поймёт, что строка принадлежит функции.
+        </div>
+    </div>
+
+    <!-- ============================================
+         ГЛАВА 3 — ПАРАМЕТРЫ И АРГУМЕНТЫ
+         ============================================ -->
+    <div class="chapter" id="ch-2">
+        <div class="card">
+            <h2>§3. Параметры и аргументы</h2>
+            <p>
+                Функция без входных данных - как чайник без воды. Чтобы передать
+                в функцию данные, используют <strong>параметры</strong>.
+            </p>
+
+            <div class="code-block">
+                <div class="code-header"> пример_параметры.py</div>
+                <div class="code-line" data-explain="p-def">
+                    <span class="line-num">1</span>
+                    <span class="line-text"><span class="kw">def</span> <span class="fn">greet</span>(<span class="par">name</span>):</span>
+                </div>
+                <div class="code-line" data-explain="p-print">
+                    <span class="line-num">2</span>
+                    <span class="line-text">    <span class="bi">print</span>(<span class="str">"Привет,"</span>, <span class="par">name</span>)</span>
+                </div>
+                <div class="code-line" data-explain="p-empty">
+                    <span class="line-num">3</span>
+                    <span class="line-text"></span>
+                </div>
+                <div class="code-line" data-explain="p-call1">
+                    <span class="line-num">4</span>
+                    <span class="line-text"><span class="fn">greet</span>(<span class="str">"Маша"</span>)</span>
+                </div>
+                <div class="code-line" data-explain="p-call2">
+                    <span class="line-num">5</span>
+                    <span class="line-text"><span class="fn">greet</span>(<span class="str">"Петя"</span>)</span>
+                </div>
+            </div>
+
+            <p class="muted">👆 Кликни по строкам для разбора.</p>
+
+            <div class="explain-panel" id="explainPanel2">
+                <div class="explain-title" id="explainTitle2">Выбери строку</div>
+                <div class="explain-text" id="explainText2">Нажми на строку кода.</div>
+            </div>
+        </div>
+
+        <!-- Несколько параметров -->
+        <div class="card">
+            <h2>Несколько параметров</h2>
+            <p>Параметров может быть сколько угодно - перечисляй их через запятую:</p>
+
+            <div class="code-block">
+                <div class="code-header"> несколько_параметров.py</div>
+                <div class="code-line">
+                    <span class="line-num">1</span>
+                    <span class="line-text"><span class="kw">def</span> <span class="fn">add</span>(<span class="par">a</span>, <span class="par">b</span>):</span>
+                </div>
+                <div class="code-line">
+                    <span class="line-num">2</span>
+                    <span class="line-text">    <span class="bi">print</span>(<span class="par">a</span> <span class="op">+</span> <span class="par">b</span>)</span>
+                </div>
+                <div class="code-line">
+                    <span class="line-num">3</span>
+                    <span class="line-text"></span>
+                </div>
+                <div class="code-line">
+                    <span class="line-num">4</span>
+                    <span class="line-text"><span class="fn">add</span>(<span class="num">3</span>, <span class="num">5</span>)       <span class="comm"># Выведет: 8</span></span>
+                </div>
+                <div class="code-line">
+                    <span class="line-num">5</span>
+                    <span class="line-text"><span class="fn">add</span>(<span class="num">10</span>, <span class="num">20</span>)     <span class="comm"># Выведет: 30</span></span>
+                </div>
+            </div>
+
+            <h3>Как Python связывает аргументы с параметрами</h3>
+            <table class="trace-table">
+                <tr><th>Вызов</th><th>a =</th><th>b =</th><th>a + b =</th></tr>
+                <tr><td><code>add(3, 5)</code></td><td>3</td><td>5</td><td>8</td></tr>
+                <tr><td><code>add(10, 20)</code></td><td>10</td><td>20</td><td>30</td></tr>
+            </table>
+
+            <div class="note">
+                💡 Аргументы подставляются <strong>по порядку</strong>:
+                первый аргумент → первый параметр, второй → второй.
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================
+         ГЛАВА 4 — RETURN
+         ============================================ -->
+    <div class="chapter" id="ch-3">
+        <div class="card">
+            <h2>§4. Возвращаем результат: <code>return</code></h2>
+
+            <p>
+                <code>print()</code> просто показывает текст на экране.
+                А <code>return</code> - <strong>возвращает</strong> значение, и его можно
+                сохранить в переменную или использовать дальше.
+            </p>
+
+            <div class="two-cols">
+                <div>
+                    <h3>❌ Только print (не возвращает)</h3>
+                    <div class="code-block">
+                        <div class="code-header">Вариант A</div>
+                        <div class="code-line">
+                            <span class="line-num">1</span>
+                            <span class="line-text"><span class="kw">def</span> <span class="fn">add</span>(<span class="par">a</span>, <span class="par">b</span>):</span>
+                        </div>
+                        <div class="code-line">
+                            <span class="line-num">2</span>
+                            <span class="line-text">    <span class="bi">print</span>(<span class="par">a</span> <span class="op">+</span> <span class="par">b</span>)</span>
+                        </div>
+                        <div class="code-line">
+                            <span class="line-num">3</span>
+                            <span class="line-text"></span>
+                        </div>
+                        <div class="code-line">
+                            <span class="line-num">4</span>
+                            <span class="line-text"><span class="par">x</span> <span class="op">=</span> <span class="fn">add</span>(<span class="num">3</span>, <span class="num">5</span>)</span>
+                        </div>
+                        <div class="code-line">
+                            <span class="line-num">5</span>
+                            <span class="line-text"><span class="bi">print</span>(<span class="par">x</span>)  <span class="comm"># None 😢</span></span>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <h3>✅ С return (возвращает)</h3>
+                    <div class="code-block">
+                        <div class="code-header">Вариант Б</div>
+                        <div class="code-line">
+                            <span class="line-num">1</span>
+                            <span class="line-text"><span class="kw">def</span> <span class="fn">add</span>(<span class="par">a</span>, <span class="par">b</span>):</span>
+                        </div>
+                        <div class="code-line">
+                            <span class="line-num">2</span>
+                            <span class="line-text">    <span class="kw">return</span> <span class="par">a</span> <span class="op">+</span> <span class="par">b</span></span>
+                        </div>
+                        <div class="code-line">
+                            <span class="line-num">3</span>
+                            <span class="line-text"></span>
+                        </div>
+                        <div class="code-line">
+                            <span class="line-num">4</span>
+                            <span class="line-text"><span class="par">x</span> <span class="op">=</span> <span class="fn">add</span>(<span class="num">3</span>, <span class="num">5</span>)</span>
+                        </div>
+                        <div class="code-line">
+                            <span class="line-num">5</span>
+                            <span class="line-text"><span class="bi">print</span>(<span class="par">x</span>)  <span class="comm"># 8 </span></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="note">
+                💡 <strong>Главное отличие:</strong><br>
+                <code>print()</code> → показывает на экране, но результат «пропадает».<br>
+                <code>return</code> → передаёт результат наружу, и ты можешь его сохранить в переменную.
+            </div>
+        </div>
+
+        <!-- Подробный разбор return -->
+        <div class="card">
+            <h2>Построчный разбор функции с <code>return</code></h2>
+
+            <div class="code-block">
+                <div class="code-header">📄 return_пример.py</div>
+                <div class="code-line" data-explain="r-def">
+                    <span class="line-num">1</span>
+                    <span class="line-text"><span class="kw">def</span> <span class="fn">multiply</span>(<span class="par">a</span>, <span class="par">b</span>):</span>
+                </div>
+                <div class="code-line" data-explain="r-result">
+                    <span class="line-num">2</span>
+                    <span class="line-text">    <span class="par">result</span> <span class="op">=</span> <span class="par">a</span> <span class="op">*</span> <span class="par">b</span></span>
+                </div>
+                <div class="code-line" data-explain="r-return">
+                    <span class="line-num">3</span>
+                    <span class="line-text">    <span class="kw">return</span> <span class="par">result</span></span>
+                </div>
+                <div class="code-line" data-explain="r-empty">
+                    <span class="line-num">4</span>
+                    <span class="line-text"></span>
+                </div>
+                <div class="code-line" data-explain="r-call">
+                    <span class="line-num">5</span>
+                    <span class="line-text"><span class="par">answer</span> <span class="op">=</span> <span class="fn">multiply</span>(<span class="num">4</span>, <span class="num">7</span>)</span>
+                </div>
+                <div class="code-line" data-explain="r-print">
+                    <span class="line-num">6</span>
+                    <span class="line-text"><span class="bi">print</span>(<span class="str">"Ответ:"</span>, <span class="par">answer</span>)</span>
+                </div>
+            </div>
+
+            <p class="muted">👆 Кликни по строкам для подробного объяснения.</p>
+
+            <div class="explain-panel" id="explainPanel3">
+                <div class="explain-title" id="explainTitle3">Выбери строку</div>
+                <div class="explain-text" id="explainText3">Нажми на строку кода.</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================
+         ГЛАВА 5 — ЗНАЧЕНИЯ ПО УМОЛЧАНИЮ
+         ============================================ -->
+    <div class="chapter" id="ch-4">
+        <div class="card">
+            <h2>§5. Значения по умолчанию</h2>
+            <p>
+                Иногда ты хочешь, чтобы параметр имел «стандартное» значение,
+                которое используется, если аргумент не передали.
+            </p>
+
+            <div class="code-block">
+                <div class="code-header"> значения_по_умолчанию.py</div>
+                <div class="code-line" data-explain="d-def">
+                    <span class="line-num">1</span>
+                    <span class="line-text"><span class="kw">def</span> <span class="fn">power</span>(<span class="par">x</span>, <span class="par">n</span><span class="op">=</span><span class="num">2</span>):</span>
+                </div>
+                <div class="code-line" data-explain="d-return">
+                    <span class="line-num">2</span>
+                    <span class="line-text">    <span class="kw">return</span> <span class="par">x</span> <span class="op">**</span> <span class="par">n</span></span>
+                </div>
+                <div class="code-line" data-explain="d-empty">
+                    <span class="line-num">3</span>
+                    <span class="line-text"></span>
+                </div>
+                <div class="code-line" data-explain="d-call1">
+                    <span class="line-num">4</span>
+                    <span class="line-text"><span class="bi">print</span>(<span class="fn">power</span>(<span class="num">5</span>))       <span class="comm"># 25 (5 ** 2)</span></span>
+                </div>
+                <div class="code-line" data-explain="d-call2">
+                    <span class="line-num">5</span>
+                    <span class="line-text"><span class="bi">print</span>(<span class="fn">power</span>(<span class="num">5</span>, <span class="num">3</span>))    <span class="comm"># 125 (5 ** 3)</span></span>
+                </div>
+                <div class="code-line" data-explain="d-call3">
+                    <span class="line-num">6</span>
+                    <span class="line-text"><span class="bi">print</span>(<span class="fn">power</span>(<span class="num">2</span>, <span class="num">10</span>))   <span class="comm"># 1024 (2 ** 10)</span></span>
+                </div>
+            </div>
+
+            <p class="muted">👆 Кликни по строкам.</p>
+
+            <div class="explain-panel" id="explainPanel4">
+                <div class="explain-title" id="explainTitle4">Выбери строку</div>
+                <div class="explain-text" id="explainText4">Нажми на строку кода.</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Таблица: как работает значение по умолчанию</h2>
+            <table class="trace-table">
+                <tr><th>Вызов</th><th>x =</th><th>n =</th><th>x ** n =</th><th>Откуда n?</th></tr>
+                <tr><td><code>power(5)</code></td><td>5</td><td>2</td><td>25</td><td>По умолчанию (n=2)</td></tr>
+                <tr><td><code>power(5, 3)</code></td><td>5</td><td>3</td><td>125</td><td>Передан аргумент 3</td></tr>
+                <tr><td><code>power(2, 10)</code></td><td>2</td><td>10</td><td>1024</td><td>Передан аргумент 10</td></tr>
+            </table>
+        </div>
+    </div>
+
+    <!-- ============================================
+         ГЛАВА 6 — ВИЗУАЛИЗАТОР
+         ============================================ -->
+    <div class="chapter" id="ch-5">
+        <div class="card">
+            <h2>§6. Визуализатор: смотри, как работает функция</h2>
+            <p>Выбери пример и нажимай «Следующий шаг», чтобы увидеть, что делает Python на каждом шаге.</p>
+
+            <div style="margin: 14px 0;">
+                <label style="font-weight: 700; color: #1b2a4a;">
+                    Выбери пример:
+                    <select id="vizSelect" style="padding:8px 12px; border:1px solid #d5c9b1; border-radius:8px; font-size:14px; margin-left:8px;"></select>
+                </label>
+            </div>
+        </div>
+
+        <div class="visualizer">
+            <div class="viz-header" id="vizTitle">Визуализатор выполнения</div>
+            <div class="viz-body">
+                <div class="viz-col">
+                    <h4>📝 Код</h4>
+                    <div id="vizCode"></div>
+                </div>
+                <div class="viz-col">
+                    <h4>📦 Переменные</h4>
+                    <div id="vizVars"><span class="muted">Нажми «Следующий шаг»</span></div>
+                    <h4 style="margin-top:16px;">🖥️ Вывод на экран</h4>
+                    <div class="viz-output" id="vizOutput"></div>
+                </div>
+            </div>
+            <div class="viz-message" id="vizMsg"></div>
+            <div class="viz-controls">
+                <button class="viz-btn primary" id="vizStepBtn">▶ Следующий шаг</button>
+                <button class="viz-btn" id="vizAutoBtn">⏩ Авто</button>
+                <button class="viz-btn" id="vizResetBtn">↺ Сначала</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================
+         ГЛАВА 7 — КВИЗ
+         ============================================ -->
+    <div class="chapter" id="ch-6">
+        <div class="card">
+            <h2>§7. Проверь себя: квиз</h2>
+            <p>Ответь на вопросы. После каждого ответа появится объяснение.</p>
+        </div>
+
+        <div id="quizContainer"></div>
+
+        <div class="score-panel" id="scorePanel"></div>
+    </div>
+
+    <!-- Нижняя навигация (появится через JS) -->
+    <div class="chapter-footer" id="chapterFooter">
+        <button class="foot-btn" id="prevBtn" disabled>← Назад</button>
+        <button class="foot-btn" id="nextBtn">Далее →</button>
+    </div>
+</div>
+
+<!-- ===================================================================
+     JAVASCRIPT
+     =================================================================== -->
+<script>
+/* ===========================================================
+   ЧАСТЬ 1: ДАННЫЕ
+   =========================================================== */
+
+// Названия глав (для кнопок навигации)
+const CHAPTERS = [
+    "§1 Что такое функция",
+    "§2 Синтаксис def",
+    "§3 Параметры",
+    "§4 return",
+    "§5 Умолчания",
+    "§6 Визуализатор",
+    "§7 Квиз"
+];
+
+// Объяснения строк кода (для кликабельных code-line)
+// Ключ = значение атрибута data-explain
+const EXPLANATIONS = {
+    // Глава 2: простая функция
+    "def-line": {
+        title: "Строка 1: def greet():",
+        text: "<code>def</code> - ключевое слово Python, означает «определить функцию». <code>greet</code> - имя функции (придумываешь сам). <code>()</code> — пустые скобки: у этой функции нет параметров (входных данных). <code>:</code> - двоеточие обязательно: оно говорит Python, что дальше начинается тело функции."
+    },
+    "print-line": {
+        title: "Строка 2:     print(\"Привет, мир!\")",
+        text: "Эта строка начинается с <strong>отступа в 4 пробела</strong> - значит она внутри функции <code>greet</code>. <code>print()</code> — встроенная функция, которая выводит текст на экран. <code>\"Привет, мир!\"</code> - строка (текст в кавычках), которую мы печатаем."
+    },
+    "empty-line": {
+        title: "Строка 3: (пустая)",
+        text: "Пустая строка отделяет определение функции от остального кода. Она не обязательна, но делает код <strong>читаемым</strong> — как абзац в книге."
+    },
+    "call-line": {
+        title: "Строка 4: greet()",
+        text: "Это <strong>вызов функции</strong>. Мы написали имя <code>greet</code> и поставили скобки <code>()</code>. Python находит определение функции (строки 1–2) и выполняет её тело. На экране появится: <code>Привет, мир!</code>."
+    },
+
+    // Глава 3: параметры
+    "p-def": {
+        title: "Строка 1: def greet(name):",
+        text: "<code>name</code> - это <strong>параметр</strong>. Он как пустая коробочка с подписью «name». Когда ты вызовешь функцию и передашь значение, оно «положится» в эту коробочку."
+    },
+    "p-print": {
+        title: "Строка 2:     print(\"Привет,\", name)",
+        text: "<code>print()</code> выводит два значения через запятую: строку <code>\"Привет,\"</code> и значение переменной <code>name</code>. Python автоматически поставит пробел между ними."
+    },
+    "p-empty": {
+        title: "Строка 3: (пустая)",
+        text: "Разделитель между определением функции и вызовами."
+    },
+    "p-call1": {
+        title: "Строка 4: greet(\"Маша\")",
+        text: "Вызываем функцию <code>greet</code> и передаём <strong>аргумент</strong> <code>\"Маша\"</code>. Python кладёт это значение в параметр <code>name</code>. Внутри функции <code>name = \"Маша\"</code>, поэтому на экране: <code>Привет, Маша</code>."
+    },
+    "p-call2": {
+        title: "Строка 5: greet(\"Петя\")",
+        text: "Второй вызов - теперь <code>name = \"Петя\"</code>. На экране: <code>Привет, Петя</code>. Одна и та же функция работает с разными данными!"
+    },
+
+    // Глава 4: return
+    "r-def": {
+        title: "Строка 1: def multiply(a, b):",
+        text: "Определяем функцию <code>multiply</code> (умножение) с двумя параметрами: <code>a</code> и <code>b</code>."
+    },
+    "r-result": {
+        title: "Строка 2:     result = a * b",
+        text: "Создаём переменную <code>result</code> и кладём в неё произведение <code>a * b</code>. Звёздочка <code>*</code> - оператор умножения в Python."
+    },
+    "r-return": {
+        title: "Строка 3:     return result",
+        text: "<code>return</code> - команда «верни значение наружу». Функция заканчивается и передаёт значение <code>result</code> туда, откуда была вызвана. Это значение можно сохранить в переменную."
+    },
+    "r-empty": {
+        title: "Строка 4: (пустая)",
+        text: "Разделитель для читаемости."
+    },
+    "r-call": {
+        title: "Строка 5: answer = multiply(4, 7)",
+        text: "Вызываем <code>multiply(4, 7)</code>: внутри функции <code>a=4</code>, <code>b=7</code>, <code>result = 28</code>. Функция возвращает 28 через <code>return</code>. Это число сохраняется в переменную <code>answer</code>."
+    },
+    "r-print": {
+        title: "Строка 6: print(\"Ответ:\", answer)",
+        text: "Выводим текст <code>\"Ответ:\"</code> и значение переменной <code>answer</code> (которое равно 28). На экране: <code>Ответ: 28</code>."
+    },
+
+    // Глава 5: значения по умолчанию
+    "d-def": {
+        title: "Строка 1: def power(x, n=2):",
+        text: "Параметр <code>n</code> имеет <strong>значение по умолчанию</strong> - число <code>2</code>. Если при вызове второй аргумент не указан, Python использует <code>n=2</code>."
+    },
+    "d-return": {
+        title: "Строка 2:     return x ** n",
+        text: "<code>**</code> - оператор возведения в степень. <code>x ** n</code> означает «x в степени n». Функция возвращает результат через <code>return</code>."
+    },
+    "d-empty": {
+        title: "Строка 3: (пустая)",
+        text: "Пустая строка-разделитель."
+    },
+    "d-call1": {
+        title: "Строка 4: print(power(5))",
+        text: "Вызываем <code>power(5)</code> - передаём только <code>x=5</code>. Параметр <code>n</code> не указан → берётся значение по умолчанию <code>n=2</code>. Результат: <code>5 ** 2 = 25</code>."
+    },
+    "d-call2": {
+        title: "Строка 5: print(power(5, 3))",
+        text: "Вызываем <code>power(5, 3)</code> - передаём <code>x=5</code> и <code>n=3</code>. Значение по умолчанию игнорируется. Результат: <code>5 ** 3 = 125</code>."
+    },
+    "d-call3": {
+        title: "Строка 6: print(power(2, 10))",
+        text: "Вызываем <code>power(2, 10)</code>: <code>x=2</code>, <code>n=10</code>. Результат: <code>2 ** 10 = 1024</code>."
+    }
+};
+
+// Примеры для визуализатора (глава 6)
+const VIZ_EXAMPLES = [
+    {
+        id: "viz-greet",
+        title: "greet(name) - приветствие",
+        code: [
+            'def greet(name):',
+            '    print("Привет,", name)',
+            '',
+            'greet("Алиса")'
+        ],
+        steps: [
+            { line: 3, vars: {}, output: "", msg: "Python видит вызов greet(\"Алиса\") и переходит к определению функции" },
+            { line: 0, vars: { name: '"Алиса"' }, output: "", msg: "Параметру name присваивается аргумент \"Алиса\"" },
+            { line: 1, vars: { name: '"Алиса"' }, output: "Привет, Алиса\n", msg: "print() выводит: Привет, Алиса" },
+            { line: 3, vars: {}, output: "Привет, Алиса\n", msg: "✅ Функция завершена. return отсутствует → результат None" }
+        ]
+    },
+    {
+        id: "viz-add",
+        title: "add(a, b) — сумма с return",
+        code: [
+            'def add(a, b):',
+            '    return a + b',
+            '',
+            'result = add(10, 25)',
+            'print("Сумма:", result)'
+        ],
+        steps: [
+            { line: 3, vars: {}, output: "", msg: "Python видит вызов add(10, 25)" },
+            { line: 0, vars: { a: 10, b: 25 }, output: "", msg: "Параметрам присвоены значения: a=10, b=25" },
+            { line: 1, vars: { a: 10, b: 25, "a + b": 35 }, output: "", msg: "Вычисляем a + b = 35 и возвращаем через return" },
+            { line: 3, vars: { result: 35 }, output: "", msg: "Результат 35 сохранён в переменную result" },
+            { line: 4, vars: { result: 35 }, output: "Сумма: 35\n", msg: "✅ print() выводит: Сумма: 35" }
+        ]
+    },
+    {
+        id: "viz-power",
+        title: "power(x, n=2) — степень с умолчанием",
+        code: [
+            'def power(x, n=2):',
+            '    return x ** n',
+            '',
+            'a = power(5)',
+            'b = power(3, 4)',
+            'print(a, b)'
+        ],
+        steps: [
+            { line: 3, vars: {}, output: "", msg: "Вызов power(5) — передан только x" },
+            { line: 0, vars: { x: 5, n: "2 (умолчание)" }, output: "", msg: "x=5, n не указан → используем значение по умолчанию n=2" },
+            { line: 1, vars: { x: 5, n: 2, "x ** n": 25 }, output: "", msg: "Вычисляем 5 ** 2 = 25. return возвращает 25" },
+            { line: 3, vars: { a: 25 }, output: "", msg: "Переменная a = 25" },
+            { line: 4, vars: { a: 25 }, output: "", msg: "Вызов power(3, 4) — передан x=3 и n=4" },
+            { line: 0, vars: { x: 3, n: 4 }, output: "", msg: "x=3, n=4 (значение по умолчанию заменено аргументом)" },
+            { line: 1, vars: { x: 3, n: 4, "x ** n": 81 }, output: "", msg: "Вычисляем 3 ** 4 = 81. return возвращает 81" },
+            { line: 4, vars: { a: 25, b: 81 }, output: "", msg: "Переменная b = 81" },
+            { line: 5, vars: { a: 25, b: 81 }, output: "25 81\n", msg: "✅ print(a, b) выводит: 25 81" }
+        ]
+    },
+    {
+        id: "viz-multi",
+        title: "Две функции: double() и square()",
+        code: [
+            'def double(x):',
+            '    return x * 2',
+            '',
+            'def square(x):',
+            '    return x * x',
+            '',
+            'a = double(5)',
+            'b = square(a)',
+            'print(b)'
+        ],
+        steps: [
+            { line: 6, vars: {}, output: "", msg: "Вызов double(5)" },
+            { line: 0, vars: { x: 5 }, output: "", msg: "Внутри double: x = 5" },
+            { line: 1, vars: { x: 5, "x * 2": 10 }, output: "", msg: "Вычисляем x * 2 = 10. return возвращает 10" },
+            { line: 6, vars: { a: 10 }, output: "", msg: "a = 10" },
+            { line: 7, vars: { a: 10 }, output: "", msg: "Вызов square(a) → square(10)" },
+            { line: 3, vars: { x: 10 }, output: "", msg: "Внутри square: x = 10" },
+            { line: 4, vars: { x: 10, "x * x": 100 }, output: "", msg: "Вычисляем x * x = 100. return возвращает 100" },
+            { line: 7, vars: { a: 10, b: 100 }, output: "", msg: "b = 100" },
+            { line: 8, vars: { a: 10, b: 100 }, output: "100\n", msg: "✅ print(b) выводит: 100" }
+        ]
+    }
+];
+
+// Вопросы квиза (глава 7)
+const QUIZ = [
+    {
+        q: "Какое ключевое слово используется для создания функции в Python?",
+        opts: ["function", "def", "func", "define"],
+        correct: 1,
+        explain: "В Python функция создаётся с помощью ключевого слова <code>def</code> (сокращение от define - определить)."
+    },
+    {
+        q: "Что обязательно ставится в конце строки <code>def greet():</code>?",
+        opts: ["Точка с запятой ;", "Фигурная скобка {", "Двоеточие :", "Ничего"],
+        correct: 2,
+        explain: "Двоеточие <code>:</code> обязательно - оно открывает блок тела функции. Без него Python выдаст <code>SyntaxError</code>."
+    },
+    {
+        q: "Чем параметр отличается от аргумента?",
+        opts: [
+            "Это одно и то же",
+            "Параметр - в определении, аргумент - при вызове",
+            "Аргумент - в определении, параметр - при вызове",
+            "Параметры бывают только числовые"
+        ],
+        correct: 1,
+        explain: "<strong>Параметр</strong> - имя в скобках при <code>def</code> (как пустая коробка). <strong>Аргумент</strong> - конкретное значение при вызове (что кладём в коробку)."
+    },
+    {
+        q: "Что выведет код?<br><code>def f(x): return x * 3</code><br><code>print(f(4))</code>",
+        opts: ["4", "3", "12", "x * 3"],
+        correct: 2,
+        explain: "<code>f(4)</code>: x = 4, return 4 * 3 = 12. <code>print(12)</code> → на экране <code>12</code>."
+    },
+    {
+        q: "Что вернёт функция, если в ней нет <code>return</code>?",
+        opts: ["0", "Пустую строку", "None", "Ошибку"],
+        correct: 2,
+        explain: "Если <code>return</code> отсутствует, функция возвращает <code>None</code> - специальное значение Python, означающее «ничего»."
+    },
+    {
+        q: "Что означает <code>def power(x, n=2)</code>?",
+        opts: [
+            "n всегда равно 2 и его нельзя изменить",
+            "Если n не передан при вызове, используется 2",
+            "x и n оба равны 2",
+            "Функция вызывается два раза"
+        ],
+        correct: 1,
+        explain: "<code>n=2</code> - значение по умолчанию. Если вызвать <code>power(5)</code>, то n будет 2. Но если вызвать <code>power(5, 3)</code>, то n будет 3."
+    },
+    {
+        q: "Какой отступ нужен для тела функции?",
+        opts: ["Отступ не нужен", "2 пробела", "4 пробела (стандарт)", "8 пробелов"],
+        correct: 2,
+        explain: "Стандарт Python (PEP 8) - <strong>4 пробела</strong>. Без отступа будет ошибка <code>IndentationError</code>."
+    },
+    {
+        q: "Что выведет код?<br><code>def hi(): print(\"Привет\")</code><br>(без вызова функции)",
+        opts: ["Привет", "Ничего", "Ошибку", "hi"],
+        correct: 1,
+        explain: "Функция <strong>определена</strong>, но <strong>не вызвана</strong>. Определение - это только «запись рецепта». Чтобы увидеть результат, нужно написать <code>hi()</code>."
+    }
+];
+
+
+/* ===========================================================
+   ЧАСТЬ 2: НАВИГАЦИЯ МЕЖДУ ГЛАВАМИ
+   =========================================================== */
+
+let currentChapter = 0;                             // Текущая глава (индекс)
+const totalChapters = CHAPTERS.length;              // Сколько глав всего
+
+const chapterNav    = document.getElementById("chapterNav");
+const progressLabel = document.getElementById("progressLabel");
+const progressFill  = document.getElementById("progressFill");
+const prevBtn       = document.getElementById("prevBtn");
+const nextBtn       = document.getElementById("nextBtn");
+
+// Создаём кнопки навигации
+CHAPTERS.forEach((name, i) => {
+    const btn = document.createElement("button");
+    btn.className = "chapter-btn" + (i === 0 ? " active" : "");
+    btn.textContent = name;
+    btn.addEventListener("click", () => goToChapter(i));
+    chapterNav.appendChild(btn);
+});
+
+// Переключение главы
+function goToChapter(index) {
+    if (index < 0 || index >= totalChapters) return;
+
+    // Прячем все главы
+    document.querySelectorAll(".chapter").forEach(el => el.classList.remove("visible"));
+
+    // Показываем нужную
+    document.getElementById("ch-" + index).classList.add("visible");
+
+    // Обновляем кнопки навигации
+    chapterNav.querySelectorAll(".chapter-btn").forEach((btn, i) => {
+        btn.classList.toggle("active", i === index);
+    });
+
+    // Обновляем прогресс
+    currentChapter = index;
+    const pct = ((index + 1) / totalChapters) * 100;
+    progressFill.style.width = pct + "%";
+    progressLabel.textContent = `Глава ${index + 1} из ${totalChapters}`;
+
+    // Обновляем кнопки «Назад / Далее»
+    prevBtn.disabled = index === 0;
+    nextBtn.disabled = index === totalChapters - 1;
+    nextBtn.textContent = index === totalChapters - 1 ? "Финиш ✓" : "Далее →";
+
+    // Прокрутка наверх
+    window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+prevBtn.addEventListener("click", () => goToChapter(currentChapter - 1));
+nextBtn.addEventListener("click", () => goToChapter(currentChapter + 1));
+
+
+/* ===========================================================
+   ЧАСТЬ 3: КЛИКАБЕЛЬНЫЕ СТРОКИ КОДА (объяснение)
+   =========================================================== */
+
+// Все строки кода, у которых есть атрибут data-explain
+document.querySelectorAll(".code-line[data-explain]").forEach(line => {
+    line.addEventListener("click", () => {
+        const key = line.dataset.explain;               // Получаем ключ объяснения
+        const info = EXPLANATIONS[key];                  // Ищем объяснение в словаре
+        if (!info) return;
+
+        // Определяем, в каком блоке кода кликнули
+        const codeBlock = line.closest(".code-block");   // Ближайший родитель .code-block
+        const card = line.closest(".card");               // Ближайшая карточка
+
+        // Снимаем подсветку со всех строк в этом блоке
+        codeBlock.querySelectorAll(".code-line").forEach(l => l.classList.remove("highlighted"));
+
+        // Подсвечиваем текущую
+        line.classList.add("highlighted");
+
+        // Ищем панель объяснения внутри этой карточки
+        const panel = card.querySelector(".explain-panel");
+        if (panel) {
+            panel.querySelector(".explain-title").textContent = info.title;
+            panel.querySelector(".explain-text").innerHTML = info.text;
+        }
+    });
+});
+
+
+/* ===========================================================
+   ЧАСТЬ 4: ВИЗУАЛИЗАТОР (Глава 6)
+   =========================================================== */
+
+const vizSelect   = document.getElementById("vizSelect");
+const vizCode     = document.getElementById("vizCode");
+const vizVars     = document.getElementById("vizVars");
+const vizOutput   = document.getElementById("vizOutput");
+const vizMsg      = document.getElementById("vizMsg");
+const vizTitle    = document.getElementById("vizTitle");
+const vizStepBtn  = document.getElementById("vizStepBtn");
+const vizAutoBtn  = document.getElementById("vizAutoBtn");
+const vizResetBtn = document.getElementById("vizResetBtn");
+
+let vizCurrent = null;      // Текущий пример
+let vizStepIdx = -1;        // Текущий шаг (-1 = ещё не начали)
+let vizAutoTimer = null;    // Таймер для авто-проигрывания
+
+// Заполняем выпадающий список примеров
+VIZ_EXAMPLES.forEach(ex => {
+    const opt = document.createElement("option");
+    opt.value = ex.id;
+    opt.textContent = ex.title;
+    vizSelect.appendChild(opt);
+});
+
+// При смене примера — загружаем его
+vizSelect.addEventListener("change", () => loadVizExample(vizSelect.value));
+
+function loadVizExample(id) {
+    const ex = VIZ_EXAMPLES.find(e => e.id === id);
+    if (!ex) return;
+
+    vizCurrent = ex;
+    vizStepIdx = -1;
+    vizTitle.textContent = ex.title;
+
+    // Рисуем строки кода
+    vizCode.innerHTML = ex.code.map((line, i) =>
+        `<div class="code-line" id="vizLine${i}" style="cursor:default;">
+            <span class="line-num">${i + 1}</span>
+            <span class="line-text">${escapeHTML(line)}</span>
+        </div>`
+    ).join("");
+
+    vizVars.innerHTML = '<span class="muted">Нажми «Следующий шаг»</span>';
+    vizOutput.textContent = "";
+    vizMsg.textContent = "";
+    vizStepBtn.disabled = false;
+    vizAutoBtn.disabled = false;
+
+    if (vizAutoTimer) { clearInterval(vizAutoTimer); vizAutoTimer = null; }
+    vizAutoBtn.textContent = "⏩ Авто";
+}
+
+// Шаг визуализатора
+function vizStep() {
+    if (!vizCurrent) return;
+
+    vizStepIdx++;
+    if (vizStepIdx >= vizCurrent.steps.length) {
+        vizStepBtn.disabled = true;
+        vizAutoBtn.disabled = true;
+        if (vizAutoTimer) { clearInterval(vizAutoTimer); vizAutoTimer = null; }
+        vizAutoBtn.textContent = "⏩ Авто";
+        return;
+    }
+
+    const step = vizCurrent.steps[vizStepIdx];
+
+    // Подсвечиваем текущую строку
+    vizCode.querySelectorAll(".code-line").forEach(el => el.classList.remove("highlighted"));
+    const lineEl = document.getElementById("vizLine" + step.line);
+    if (lineEl) lineEl.classList.add("highlighted");
+
+    // Обновляем переменные
+    const entries = Object.entries(step.vars);
+    if (entries.length === 0) {
+        vizVars.innerHTML = '<span class="muted">Переменных пока нет</span>';
+    } else {
+        vizVars.innerHTML = entries.map(([k, v]) =>
+            `<div class="viz-var flash"><span>${escapeHTML(k)}</span><span>= ${escapeHTML(String(v))}</span></div>`
+        ).join("");
+    }
+
+    // Обновляем вывод
+    vizOutput.textContent = step.output;
+
+    // Сообщение
+    vizMsg.textContent = step.msg;
+
+    // Конец?
+    if (vizStepIdx >= vizCurrent.steps.length - 1) {
+        vizStepBtn.disabled = true;
+        vizAutoBtn.disabled = true;
+        if (vizAutoTimer) { clearInterval(vizAutoTimer); vizAutoTimer = null; }
+        vizAutoBtn.textContent = "⏩ Авто";
+    }
+}
+
+// Авто-проигрывание
+function vizAutoToggle() {
+    if (vizAutoTimer) {
+        clearInterval(vizAutoTimer);
+        vizAutoTimer = null;
+        vizAutoBtn.textContent = "⏩ Авто";
+    } else {
+        vizAutoBtn.textContent = "⏸ Пауза";
+        vizAutoTimer = setInterval(() => {
+            vizStep();
+            if (vizStepIdx >= vizCurrent.steps.length - 1) {
+                clearInterval(vizAutoTimer);
+                vizAutoTimer = null;
+                vizAutoBtn.textContent = "⏩ Авто";
+            }
+        }, 1400);
+    }
+}
+
+// Сброс
+function vizReset() {
+    if (vizCurrent) loadVizExample(vizCurrent.id);
+}
+
+vizStepBtn.addEventListener("click", vizStep);
+vizAutoBtn.addEventListener("click", vizAutoToggle);
+vizResetBtn.addEventListener("click", vizReset);
+
+// Загружаем первый пример
+loadVizExample(VIZ_EXAMPLES[0].id);
+
+
+/* ===========================================================
+   ЧАСТЬ 5: КВИЗ (Глава 7)
+   =========================================================== */
+
+const quizContainer = document.getElementById("quizContainer");
+const scorePanel    = document.getElementById("scorePanel");
+
+let quizScore    = 0;     // Количество правильных ответов
+let quizAnswered = 0;     // Сколько вопросов отвечено
+const quizDone   = new Set();  // Индексы отвеченных вопросов
+
+// Рисуем все вопросы
+QUIZ.forEach((item, qi) => {
+    const block = document.createElement("div");
+    block.className = "quiz-block";
+    block.innerHTML = `
+        <h3>Вопрос ${qi + 1} из ${QUIZ.length}</h3>
+        <p>${item.q}</p>
+        <div class="quiz-options" id="qopts-${qi}"></div>
+        <div class="quiz-feedback" id="qfb-${qi}"></div>
+    `;
+    quizContainer.appendChild(block);
+
+    const optsDiv = block.querySelector(`#qopts-${qi}`);
+
+    item.opts.forEach((text, oi) => {
+        const btn = document.createElement("button");
+        btn.className = "quiz-opt";
+        btn.innerHTML = text;
+
+        btn.addEventListener("click", () => {
+            if (quizDone.has(qi)) return;   // Уже отвечен
+            quizDone.add(qi);
+            quizAnswered++;
+
+            const isCorrect = oi === item.correct;
+            if (isCorrect) quizScore++;
+
+            // Подсвечиваем варианты
+            optsDiv.querySelectorAll(".quiz-opt").forEach((o, idx) => {
+                o.classList.add("locked");
+                if (idx === item.correct) o.classList.add("correct");
+                else if (idx === oi && !isCorrect) o.classList.add("wrong");
+            });
+
+            // Показываем объяснение
+            const fb = document.getElementById("qfb-" + qi);
+            fb.className = "quiz-feedback show " + (isCorrect ? "ok" : "no");
+            fb.innerHTML = (isCorrect ? "✅ Верно! " : "❌ Неверно. ") + item.explain;
+
+            // Если все вопросы отвечены — показываем итог
+            if (quizAnswered === QUIZ.length) {
+                scorePanel.classList.add("show");
+                const pct = Math.round((quizScore / QUIZ.length) * 100);
+                let emoji = pct === 100 ? "🏆" : pct >= 75 ? "👍" : pct >= 50 ? "📚" : "💪";
+                scorePanel.innerHTML = `${emoji} Результат: ${quizScore} из ${QUIZ.length} (${pct}%)`;
+            }
+        });
+
+        optsDiv.appendChild(btn);
+    });
+});
+
+
+/* ===========================================================
+   ЧАСТЬ 6: ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ
+   =========================================================== */
+
+// Экранирование HTML (чтобы символы < > не ломали разметку)
+function escapeHTML(str) {
+    return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+}
+</script>
+
+</body>
+</html>
